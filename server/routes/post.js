@@ -26,4 +26,26 @@ router.post('/createpost',requireLogin,(req,res)=>{
     })
 })
 
+router.get('/allpost',(req,res)=>{
+    Post.find()
+    .populate('postedBy',"_id name")
+    .then((posts)=>{
+        res.status(200).json({posts})
+    })
+    .catch(e=>{
+        console.log(e)
+    })
+})
+
+router.get('/mypost',requireLogin,(req,res)=>{
+    Post.find({postedBy:req.user._id})
+    .populate('postedBy',"_id name")
+    .then((posts)=>{
+        res.status(200).json({posts})
+    })
+    .catch(e=>{
+        console.log(e)
+    })
+})
+
 module.exports = router
