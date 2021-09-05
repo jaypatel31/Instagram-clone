@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import { useHistory } from 'react-router-dom'
 import axios from "axios"
 import M from "materialize-css"
@@ -9,6 +9,33 @@ const CreatPost = () => {
     const [body, setBody] = useState("")
     const [image, setImage] = useState("")
     const [url, setUrl] = useState("")
+
+    useEffect(() => {
+        if(url){
+            axios.post("/createpost",{
+                title,
+                body,
+                pic:url
+            },
+            {
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization":"Bearer "+localStorage.getItem("jwt")
+                },
+    
+            })
+            .then(response=>{
+                console.log(response.data)
+                M.toast({html: "Created Post Successfully",classes:"#43a047 green darken-1"})
+                history.push('/')
+            })
+            .catch(e=>{
+                M.toast({html: e.response.data.error,classes:"#e53935 red darken-1"})
+                console.log(e.response.data)
+            })
+        }
+        
+    }, [url])
 
     const postDetails = (e) =>{
         const data = new FormData()
@@ -28,26 +55,7 @@ const CreatPost = () => {
             console.log(e)
         })
 
-        axios.post("/createpost",{
-            title,
-            body,
-            url
-        },
-        {
-            headers:{
-                "Content-Type":"application/json"
-            },
-
-        })
-        .then(response=>{
-            console.log(response.data)
-            M.toast({html: "Created Post Successfully",classes:"#43a047 green darken-1"})
-            history.push('/')
-        })
-        .catch(e=>{
-            M.toast({html: e.response.data.error,classes:"#e53935 red darken-1"})
-            console.log(e.response.data)
-        })
+        
     }
 
     return (
