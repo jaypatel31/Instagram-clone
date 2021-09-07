@@ -2,6 +2,7 @@ import React,{useState,useEffect, useContext} from 'react'
 import axios from 'axios'
 import { UserContext } from '../../App'
 import M from "materialize-css"
+import { Link } from 'react-router-dom'
 
 const Home = () => {
     const [data, setData] = useState([])
@@ -147,7 +148,7 @@ const Home = () => {
                     return(
                         <div className="card home-card" key={index}>
                             <h5>
-                                {item.postedBy.name}
+                                <Link to={state._id!==item.postedBy._id?`/profile/${item.postedBy._id}`:"/profile"}>{item.postedBy.name}</Link>
                                 
                                 {
                                     (state._id===item.postedBy._id)?<i className="material-icons" style={{cursor:"Pointer",color:"red",float:"right"}} onClick={(e)=>{deletePost(item._id)}}>delete</i>:""
