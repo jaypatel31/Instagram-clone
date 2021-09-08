@@ -15,7 +15,7 @@ const UserProfile = () => {
             }
         })
         .then(response=>{
-            console.log(response.data)
+            console.log()
             setUserProfile(response.data)
         })
         .catch(e=>{
@@ -97,7 +97,7 @@ const UserProfile = () => {
                 borderBottom:"1px solid gray"
             }}>
                 <div>
-                    <img style={{width:"160px",height:"160px",borderRadius:"50%"}} src="https://images.unsplash.com/photo-1610216705422-caa3fcb6d158?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8MnwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Person"/>
+                    <img style={{width:"160px",height:"160px",borderRadius:"50%"}} src={userProfile.user.pic} alt="Person"/>
                 </div>
                 <div>
                     <h4>{userProfile.user.name}</h4>
@@ -108,7 +108,7 @@ const UserProfile = () => {
                         <h6>{userProfile.user.following.length} following</h6>
                     </div>
                     {
-                        showFollow?
+                        (!userProfile.user.followers.includes(state._id))?
                         <button style={{margin:"10px"}} className="btn waves-effect waves-light #1e88e5 blue darken-1" onClick={(e)=>followUser()}>
                             Follow
                         </button>:

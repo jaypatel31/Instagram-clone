@@ -28,10 +28,11 @@ const Profile = () => {
                 borderBottom:"1px solid gray"
             }}>
                 <div>
-                    <img style={{width:"160px",height:"160px",borderRadius:"50%"}} src="https://images.unsplash.com/photo-1610216705422-caa3fcb6d158?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29ufGVufDB8MnwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60" alt="Person"/>
+                    <img style={{width:"160px",height:"160px",borderRadius:"50%"}} src={state?state.pic:""} alt="Person"/>
                 </div>
                 <div>
                     <h4>{state?state.name:"Loading"}</h4>
+                    <h5>{state?state.email:"Loading"}</h5>
                     <div style={{display:"flex",justifyContent:"space-between",width:"108%"}}>
                         <h6>{profile.length} post</h6>
                         <h6>{state?state.followers.length:"0"} follower</h6>

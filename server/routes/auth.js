@@ -9,7 +9,7 @@ const {JWT_SECTRET} = require('../keys')
 
 
 router.post('/signup',(req,res)=>{
-    const {name, email, password} = req.body
+    const {name, email, password, pic} = req.body
 
     if(!email || !password || !name){
         return res.status(422).json({error:"Please add all the field"})
@@ -25,7 +25,8 @@ router.post('/signup',(req,res)=>{
                         const user = new User({
                             email,
                             name,
-                            password:hashedpassword
+                            password:hashedpassword,
+                            pic
                         })
                         user.save()
                         .then((user)=>{
@@ -60,8 +61,8 @@ router.post('/signin',(req,res)=>{
             if(doMatch){
                 // return res.status(200).json({message:"successfully signed in"})
                 const token = jwt.sign({_id:savedUser._id},JWT_SECTRET)
-                const {_id,name,email} = savedUser
-                return res.status(200).json({token,message:"successfully signed in",user:{_id,name,email}})
+                const {_id,name,email, followers, following,pic} = savedUser
+                return res.status(200).json({token,message:"successfully signed in",user:{_id,name,email,followers, following,pic}})
             }else{
                 return res.status(422).json({error:"Invalid Email or Password"})
             }

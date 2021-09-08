@@ -4,12 +4,12 @@ import { UserContext } from '../../App'
 import M from "materialize-css"
 import { Link } from 'react-router-dom'
 
-const Home = () => {
+const SubscibesUsersPost = () => {
     const [data, setData] = useState([])
     const {state,dispatch} = useContext(UserContext)
 
     useEffect(() => {
-        axios.get("/allpost",{
+        axios.get("/getsubpost",{
             headers:{
                 "Authorization":"Bearer "+localStorage.getItem("jwt")
             }
@@ -144,6 +144,8 @@ const Home = () => {
     return (
         <div className="home">
             {
+                state.following.length>0?
+                data.length>0?
                 data.map((item,index)=>{
                     return(
                         <div className="card home-card" key={index}>
@@ -190,7 +192,9 @@ const Home = () => {
                             </div>
                         </div>
                     )
-                })
+                }):
+                <h2 style={{textAlign:"center"}}>Loading</h2>:
+                <h2 style={{textAlign:"center"}}>Not Following anyone</h2>
             }
 
             
@@ -199,4 +203,4 @@ const Home = () => {
     )
 }
 
-export default Home
+export default SubscibesUsersPost

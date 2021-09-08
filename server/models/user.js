@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    pic:{
+        type:String,
+        default:"https://res.cloudinary.com/instagram-clone31/image/upload/v1631101425/R_1_bdi3ad.png"
+    },
     followers:[{type:mongoose.Schema.Types.ObjectId,ref:"User"}],
     following:[{type:mongoose.Schema.Types.ObjectId,ref:"User"}]
 })
