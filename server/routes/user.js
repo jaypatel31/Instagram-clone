@@ -87,4 +87,69 @@ router.put("/updatepic",requireLogin,(req,res)=>{
     })
 })
 
+router.put("/updatedetails",requireLogin,(req,res)=>{
+    const {name,email} = req.body
+    if(email !== req.user.email){
+        User.findOne({email:email})
+        .then((savedUser)=>{
+            if(savedUser){
+                return res.status(422).json({error:"Email already registered"})
+            }else{
+                User.findByIdAndUpdate(req.user._id,{
+                    $set:{name,email}
+                },{
+                    new:true
+                })
+                .select("-password")
+                .exec((err,result)=>{
+                    if(err){
+                        return res.status(422).json({error:err})
+                    }
+                    return res.status(201).json(result)
+                })
+            }
+        })
+    }
+    
+    User.findByIdAndUpdate(req.user._id,{
+        $set:{name,email}
+    },{
+        new:true
+    })
+    .select("-password")
+    .exec((err,result)=>{
+        if(err){
+            return res.status(422).json({error:err})
+        }
+        return res.status(201).json(result)
+    })
+})
+
+router.delete("/deleteuser/:id",requireLogin,(req,res)=>[
+    
+    User.findOne({_id:req.params.id})
+    .exec((err,user)=>{
+        if(err || !user){
+            return res.status(422).json({error:err})
+        }
+        
+        if(req.params.id.toString() === req.user._id.toString()){
+           user.remove()
+           .then(result=>{
+                Post.deleteMany({postedBy:req.user._id})
+                .then(result2=>{
+                    return res.status(200).json({result,result2})
+                })
+           })
+           .catch(e=>{
+               console.log(e)
+           })
+        }
+        else{
+            return res.status(401).json({error:"Unauthorized Action"})
+        }
+
+    })
+])
+
 module.exports = router

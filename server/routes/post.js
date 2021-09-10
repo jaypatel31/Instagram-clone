@@ -162,4 +162,21 @@ router.delete("/deletepost/:postId",requireLogin,(req,res)=>{
     })
 })
 
+router.put("/updatepost",requireLogin,(req,res)=>{
+    const {title,body,pic} = req.body
+    Post.findOneAndUpdate({ "_id": req.body.postId,"postedBy":req.user._id },{
+        $set:{title,body,photo:pic}
+    },{
+        new:true
+    })
+    .populate('postedBy',"_id name")
+    .populate("comments.postedBy","_id name")
+    .exec((err,result)=>{
+        if(err){
+            return res.status(422).json({error:err})
+        }
+        res.status(201).json(result);
+    })
+})
+
 module.exports = router

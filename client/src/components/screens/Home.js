@@ -7,6 +7,10 @@ import { Link } from 'react-router-dom'
 const Home = () => {
     const [data, setData] = useState([])
     const {state,dispatch} = useContext(UserContext)
+    const [title, setTitle] = useState("")
+    const [body, setBody] = useState("")
+    const [image, setImage] = useState("")
+    const [url, setUrl] = useState("")
 
     useEffect(() => {
         axios.get("/allpost",{
@@ -17,6 +21,8 @@ const Home = () => {
         .then(response=>{
             console.log(response.data.posts)
             setData(response.data.posts)
+            var elems = document.querySelectorAll('.modal');
+            var instances = M.Modal.init(elems);
         })
         .catch(e=>{
             console.log(e)
@@ -107,7 +113,7 @@ const Home = () => {
         .then(response=>{
             console.log(response.data)
             const newData = data.filter(item=>{
-                return item._id !== response.data._id
+                return item._id.toString() !== response.data.result._id.toString()
             })
             setData(newData)
         })
@@ -141,8 +147,78 @@ const Home = () => {
         })
     }
 
+    const setValue = (postId) =>{
+        data.map(item=>{
+            if(item._id === postId){
+                setTitle(item.title)
+                setBody(item.body)
+                setImage(item.photo)
+                setUrl(item.photo)
+            }
+        })
+    }
+
+    const updatePost = (postId,url) =>{
+        axios.put("/updatepost",{
+            postId,
+            title,
+            body,
+            pic:url
+        },
+        {
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer "+localStorage.getItem("jwt")
+            },
+
+        })
+        .then(response=>{
+            console.log(response.data)
+            M.toast({html: "Updated Post Successfully",classes:"#43a047 green darken-1"})
+            let newData = data.map(item=>{
+                if(item._id===response.data._id){
+                    return response.data
+                }
+                return item;
+            })
+            setData(newData)
+
+        })
+        .catch(e=>{
+            M.toast({html: e.response.data.error,classes:"#e53935 red darken-1"})
+            console.log(e.response.data)
+        })
+    }
+
+    const editPost = (postId)=>{
+        if(typeof(image) !== "object"){
+            updatePost(postId,url)
+        }
+        else{
+            const data = new FormData()
+            data.append('file',image)
+            data.append('upload_preset',"insta-clone")
+            data.append("cloud_name","instagram-clone31")
+
+            fetch("https://api.cloudinary.com/v1_1/instagram-clone31/image/upload",{
+                method:"post",
+                body:data
+            })
+            .then(res=>res.json())
+            .then(data=>{
+                updatePost(postId,data.url);
+            })
+            .catch(e=>{
+                console.log(e)
+            })
+        }
+        
+    }
+
     return (
         <div className="home">
+
+        
             {
                 data.map((item,index)=>{
                     return(
@@ -154,7 +230,53 @@ const Home = () => {
                                     (state._id===item.postedBy._id)?<i className="material-icons" style={{cursor:"Pointer",color:"red",float:"right"}} onClick={(e)=>{deletePost(item._id)}}>delete</i>:""
                                 }
 
+                                {
+                                    (state._id===item.postedBy._id)?  <a className="modal-trigger" style={{float:'right'}} onClick={()=>{setValue(item._id)}} href={`#${item._id}`}><i className="material-icons" style={{cursor:"Pointer",color:"blue"}}>edit</i></a>:""
+                                }
                             </h5>
+                            <div id={item._id} className="modal">
+                                <h4>Update Post</h4>
+                                <div className="card input-field" style={{
+                                    margin:"30px auto",
+                                    maxWidth:"500px",
+                                    padding:"20px",
+                                    textAlign:"center"
+                                }}>
+                                    <input
+                                        type="text"
+                                        name="title"
+                                        placeholder="Title"
+                                        value={title}
+                                        onChange={(e)=>setTitle(e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        name="body"
+                                        placeholder="Body"
+                                        value={body}
+                                        onChange={(e)=>setBody(e.target.value)}
+                                    />
+
+                                    <div className="file-field input-field">
+                                        <div className="btn #1e88e5 blue darken-1">
+                                            <span>Upload Image</span>
+                                            <input 
+                                                type="file"
+                                                onChange={(e)=>setImage(e.target.files[0])}
+                                            />
+                                        </div>
+                                        <div className="file-path-wrapper">
+                                            <input className="file-path validate" type="text" value={item.photo} onChange={(e)=>{console.log(e.target.value)}}/>
+                                        </div>
+                                    </div>
+                                    <div style={{display:'flex',justifyContent:"space-around"}}>
+                                        <a href="#!" className="modal-close btn #1e88e5 blue darken-1" style={{color:"white !important"}}>Cancel</a>
+
+                                        <a href="#!" className="modal-close btn #1e88e5 blue darken-1" style={{color:"white !important"}} onClick={(e)=>editPost(item._id)}>Update Post</a>
+                                    </div>
+                                </div>
+                               
+                            </div>
                             <div className="card-image">
                                 <img src={item.photo} alt=""/>
                             </div>

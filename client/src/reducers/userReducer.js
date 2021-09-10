@@ -18,6 +18,12 @@ export const reducer = (state,action) =>{
                 ...state,
                 pic:action.payload
             }
+        case "UPDATEDETAILS":
+            return{
+                ...state,
+                name:action.payload.name,
+                email:action.payload.email
+            }
         default:
             return state;
     }
