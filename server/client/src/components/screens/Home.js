@@ -89,7 +89,7 @@ const Home = () => {
         })
         .then(response=>{
             console.log(response)
-            M.toast({html: "Post Deleted Successfully",classes:"#43a047 green darken-1"})
+            M.toast({html: "Comment Added Successfully",classes:"#43a047 green darken-1"})
             const newData = data.map(item=>{
                 if(item._id===response.data._id){
                     return response.data
@@ -215,6 +215,76 @@ const Home = () => {
         
     }
 
+    const editComment = (postId,commentId)=>{
+        document.getElementById(commentId).contentEditable = true;
+        document.getElementById(commentId).focus();
+        document.getElementById(commentId).classList.add('editing');
+    }
+
+    const blurHandler = (postId,commentId)=>{
+        if(document.getElementById(commentId).contentEditable){
+            let val = document.getElementById(commentId).innerText
+            console.log(val);
+            if(val.trim()!==""){
+                document.getElementById(commentId).contentEditable = false;
+                document.getElementById(commentId).classList.remove('editing');
+                updateComment(postId,commentId);
+            }else{
+                M.toast({html: "Can't post empty comment",classes:"#e53935 red darken-1"})
+                data.map(item=>{
+                    if(item._id==postId){
+                        item.comments.map(comment=>{
+                            if(comment._id == commentId){
+                                document.getElementById(commentId).innerText = comment.text
+                            }
+                        }) 
+                    }
+                })
+                document.getElementById(commentId).contentEditable = false;
+                document.getElementById(commentId).classList.remove('editing');
+            }
+            
+        }
+        
+    }
+
+    const updateComment = (postId,commentId)=>{
+        let text = document.getElementById(commentId).innerText
+        axios.put("/updatecomment",{
+            text,
+            postId,
+            commentId
+        },{
+            headers:{
+                "Content-Type":"application/json",
+                "Authorization":"Bearer "+localStorage.getItem("jwt")
+            }
+        })
+        .then(response=>{
+            console.log(response)
+            M.toast({html: "Comment Updated Successfully",classes:"#43a047 green darken-1"})
+            const newData = data.map(item=>{
+                if(item._id===response.data._id){
+                    return response.data
+                }else{
+                    return item
+                }
+            })
+            setData(newData)
+        })
+        .catch(e=>{
+            console.log(e)
+        })
+
+    }
+
+    const changeDetection = (event,postId,commentId) =>{
+        if(event.keyCode === 13 || event.keyCode === 9){
+            let val = document.getElementById(commentId).innerText
+                document.getElementById(commentId).innerText = val.trim();
+                document.getElementById(commentId).blur();
+        }
+    }
     return (
         <div className="home">
 
@@ -291,8 +361,8 @@ const Home = () => {
                                 {
                                     item.comments.map((comment,index)=>{
                                         return(
-                                            <h6 key={index}><span style={{fontWeight:"500"}}>{comment.postedBy.name}</span> {comment.text} {
-                                                (state._id===comment.postedBy._id)?<i className="material-icons" style={{cursor:"Pointer",color:"red",float:"right"}} onClick={(e)=>{deleteComment(item._id,comment._id)}}>delete</i>:""
+                                            <h6 key={index}><span style={{fontWeight:"500"}}>{comment.postedBy.name}</span> <span onKeyUp={(e)=>{changeDetection(e,item._id,comment._id)}} onBlur={()=>blurHandler(item._id,comment._id)} id={comment._id}>{comment.text}</span> {
+                                                (state._id===comment.postedBy._id)?<><i className="material-icons" style={{cursor:"Pointer",color:"blue",float:"right"}} onClick={(e)=>{editComment(item._id,comment._id)}}>edit</i><i className="material-icons" style={{cursor:"Pointer",color:"red",float:"right"}} onClick={(e)=>{deleteComment(item._id,comment._id)}}>delete</i></>:""
                                             }</h6>
                                         )
                                     })

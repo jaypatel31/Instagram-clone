@@ -123,7 +123,6 @@ router.put("/comment",requireLogin,(req,res)=>{
 
 router.put("/deletecomment",requireLogin,(req,res)=>{
     const {commentId} = req.body
-    console.log(new ObjectId(commentId),req.user._id)
     Post.findByIdAndUpdate(req.body.postId,{
         $pull:{comments:{_id:new ObjectId(commentId),postedBy:req.user._id}}
     },{
@@ -176,6 +175,25 @@ router.put("/updatepost",requireLogin,(req,res)=>{
             return res.status(422).json({error:err})
         }
         res.status(201).json(result);
+    })
+})
+
+router.put("/updatecomment",requireLogin,(req,res)=>{
+    const {text,commentId,postId} = req.body
+    Post.findOneAndUpdate({"_id":new ObjectId(postId),"comments._id":new ObjectId(commentId)},{
+        $set:{"comments.$.text":text}
+    },{
+        new:true
+    })
+    .populate('postedBy',"_id name")
+    .populate("comments.postedBy","_id name")
+    .exec((err,result)=>{
+        if(err){
+            return res.status(422).json({error:err})
+        }
+        else{
+            res.status(201).json(result)
+        }
     })
 })
 

@@ -109,20 +109,25 @@ router.put("/updatedetails",requireLogin,(req,res)=>{
                 })
             }
         })
+        .catch(e=>{
+            console.log(e)
+        })
+    }
+    else{
+        User.findByIdAndUpdate(req.user._id,{
+            $set:{name,email}
+        },{
+            new:true
+        })
+        .select("-password")
+        .exec((err,result)=>{
+            if(err){
+                return res.status(422).json({error:err})
+            }
+            return res.status(201).json(result)
+        })
     }
     
-    User.findByIdAndUpdate(req.user._id,{
-        $set:{name,email}
-    },{
-        new:true
-    })
-    .select("-password")
-    .exec((err,result)=>{
-        if(err){
-            return res.status(422).json({error:err})
-        }
-        return res.status(201).json(result)
-    })
 })
 
 router.delete("/deleteuser/:id",requireLogin,(req,res)=>[
