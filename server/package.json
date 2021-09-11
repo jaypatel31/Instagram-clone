@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start":"node app.js",
-    "heroku-postbuilt":"NPM_CONFIG_PRODUCTION=false npm install --prefix client && npm run build --prefix client"
+    "heroku-postbuilt":"cd client && npm install && npm run build"
   },
   "author": "",
   "license": "ISC",
