@@ -361,7 +361,7 @@ const Home = () => {
                                 {
                                     item.comments.map((comment,index)=>{
                                         return(
-                                            <h6 key={index}><span style={{fontWeight:"500"}}>{comment.postedBy.name}</span> <span onKeyUp={(e)=>{changeDetection(e,item._id,comment._id)}} onBlur={()=>blurHandler(item._id,comment._id)} id={comment._id}>{comment.text}</span> {
+                                            <h6 key={index}><span style={{fontWeight:"500",verticalAlign:"top"}}>{comment.postedBy.name}</span> <span className="comment" onKeyUp={(e)=>{changeDetection(e,item._id,comment._id)}} onBlur={()=>blurHandler(item._id,comment._id)} id={comment._id}>{comment.text}</span> {
                                                 (state._id===comment.postedBy._id)?<><i className="material-icons" style={{cursor:"Pointer",color:"blue",float:"right"}} onClick={(e)=>{editComment(item._id,comment._id)}}>edit</i><i className="material-icons" style={{cursor:"Pointer",color:"red",float:"right"}} onClick={(e)=>{deleteComment(item._id,comment._id)}}>delete</i></>:""
                                             }</h6>
                                         )

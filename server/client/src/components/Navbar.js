@@ -1,11 +1,14 @@
-import React,{useContext} from 'react'
+import React,{useContext,useEffect} from 'react'
 import {Link, useHistory} from "react-router-dom"
 import { UserContext } from '../App'
+import {M }from 'materialize-css'
 
 const Navbar = () => {
     const history = useHistory()
     const {state, dispatch} = useContext(UserContext)
+
     const renderList = () =>{
+      
       if(state){
         return [
           <li><Link to={"/profile"}>Profile</Link></li>,
@@ -29,15 +32,21 @@ const Navbar = () => {
       }
     } 
     return (
+      <>
         <nav>
         <div className="nav-wrapper white">
           <Link to={state?"/":"/signin"} className="brand-logo left">Instagram</Link>
-          <ul id="nav-mobile" className="right ">
+          <a href="#" data-target="mobile-demo" className="sidenav-trigger right"><i className="material-icons">menu</i></a>
+          <ul id="nav-mobile" className="right hide-on-med-and-down ">
             {renderList()}
           </ul>
         </div>
       </nav>
-            
+
+      <ul className="sidenav" id="mobile-demo">
+        {renderList()}
+      </ul>
+       </>     
     )
 }
 
