@@ -4,8 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start":"node app.js",
-    "heroku-postbuilt":"cd client && npm install"
+    "start": "node app.js",
+    "heroku-postbuilt": "cd client && npm install"
   },
   "author": "",
   "license": "ISC",
@@ -14,6 +14,9 @@
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.0.3",
-    "nodemon": "^2.0.12"
+    "nodemailer": "^6.6.3",
+    "nodemailer-sendinblue-transport": "^1.2.3",
+    "nodemon": "^2.0.12",
+    "sib-api-v3-sdk": "^8.2.1"
   }
 }

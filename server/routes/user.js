@@ -157,4 +157,16 @@ router.delete("/deleteuser/:id",requireLogin,(req,res)=>[
     })
 ])
 
+router.post('/search-users',(req,res)=>{
+    let userPattern = new RegExp("^"+req.body.pattern)
+    User.find({email:{$regex:userPattern}})
+    .select("_id email")
+    .then(user=>{
+        return res.status(200).json({user})
+    })
+    .catch(err=>{
+        console.log(err)
+    })
+})
+
 module.exports = router

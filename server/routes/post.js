@@ -32,6 +32,7 @@ router.get('/allpost',requireLogin,(req,res)=>{
     Post.find()
     .populate('postedBy',"_id name")
     .populate('comments.postedBy',"_id name")
+    .sort('-createdAt')
     .then((posts)=>{
         res.status(200).json({posts})
     })
@@ -44,6 +45,7 @@ router.get('/getsubpost',requireLogin,(req,res)=>{
     Post.find({postedBy:{$in:req.user.following}})
     .populate('postedBy',"_id name")
     .populate('comments.postedBy',"_id name")
+    .sort('-createdAt')
     .then((posts)=>{
         res.status(200).json({posts})
     })
@@ -71,6 +73,7 @@ router.put("/like",requireLogin,(req,res)=>{
     })
     .populate('postedBy',"_id name")
     .populate("comments.postedBy","_id name")
+    .sort('-createdAt')
     .exec((err,result)=>{
         if(err){
             return res.status(422).json({error:err})
@@ -89,6 +92,7 @@ router.put("/unlike",requireLogin,(req,res)=>{
     })
     .populate('postedBy',"_id name")
     .populate("comments.postedBy","_id name")
+    .sort('-createdAt')
     .exec((err,result)=>{
         if(err){
             return res.status(422).json({error:err})
@@ -111,6 +115,7 @@ router.put("/comment",requireLogin,(req,res)=>{
     })
     .populate('postedBy',"_id name")
     .populate("comments.postedBy","_id name")
+    .sort('-createdAt')
     .exec((err,result)=>{
         if(err){
             return res.status(422).json({error:err})
@@ -130,6 +135,7 @@ router.put("/deletecomment",requireLogin,(req,res)=>{
     })
     .populate('postedBy',"_id name")
     .populate("comments.postedBy","_id name")
+    .sort('-createdAt')
     .exec((err,result)=>{
         if(err){
             return res.status(422).json({error:err})
@@ -170,6 +176,7 @@ router.put("/updatepost",requireLogin,(req,res)=>{
     })
     .populate('postedBy',"_id name")
     .populate("comments.postedBy","_id name")
+    .sort('-createdAt')
     .exec((err,result)=>{
         if(err){
             return res.status(422).json({error:err})
@@ -187,6 +194,7 @@ router.put("/updatecomment",requireLogin,(req,res)=>{
     })
     .populate('postedBy',"_id name")
     .populate("comments.postedBy","_id name")
+    .sort('-createdAt')
     .exec((err,result)=>{
         if(err){
             return res.status(422).json({error:err})

@@ -9,6 +9,8 @@ const userSchema = new mongoose.Schema({
         type:String,
         required:true
     },
+    resetToken:String,
+    expireToken:Date,
     password:{
         type:String,
         required:true

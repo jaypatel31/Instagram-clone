@@ -2,10 +2,17 @@ const express = require('express')
 const router = express.Router()
 const mongoose = require('mongoose')
 const User = mongoose.model('User')
+const crypto = require('crypto')
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
-const {JWT_SECTRET} = require('../config/keys')
+const {JWT_SECTRET,SENDINBLUE_API,EMAIL} = require('../config/keys')
+const nodemailer = require('nodemailer');
+const sibTransport = require('nodemailer-sendinblue-transport');
 
+
+const transporter = nodemailer.createTransport(sibTransport({
+    apiKey:SENDINBLUE_API
+}))
 
 
 router.post('/signup',(req,res)=>{
@@ -30,6 +37,12 @@ router.post('/signup',(req,res)=>{
                         })
                         user.save()
                         .then((user)=>{
+                            transporter.sendMail({
+                                to:user.email,
+                                from:"no-reply@insta.com",
+                                subject:"Signup Success",
+                                html:"<h1>Welcome to Instagram-clone</h1>"
+                            })
                             res.status(200).json({message:"User Saved Successfully"})
                         })
                         .catch((e)=>{
@@ -76,4 +89,55 @@ router.post('/signin',(req,res)=>{
     })
 })
 
+router.post('/resetpassword',(req,res)=>{
+    crypto.randomBytes(32,(err,buffer)=>{
+        if(err){
+            console.log(err)
+        }
+        const token = buffer.toString("hex")
+        User.findOne({email:req.body.email})
+        .then(user=>{
+            if(!user){
+                return res.status(422).json({error:"User doesn't exist with that email"})
+            }
+            user.resetToken = token
+            user.expireToken = Date.now()+3600000
+            user.save().then(result=>{
+                
+                transporter.sendMail({
+                    to:user.email,
+                    from:"no-reply@insta.com",
+                    subject:"Password Reset",
+                    html:`
+                        <p>You requested for password Reset</p>
+                        <h5>Click in this <a href="${EMAIL}/reset/${token}">link</a> to reset password</h5>
+                    `
+                })
+            })
+            return res.status(200).json({message:"Check your Mail"})
+        })
+    })
+})
+
+router.post('/new-password',(req,res)=>{
+    const {password, sentToken} = req.body
+    User.findOne({resetToken:sentToken,expireToken:{$gt:Date.now()}})
+    .then(user=>{
+        if(!user){
+            return res.status(422).json({error:"Try Again session experied"})
+        }
+        bcrypt.hash(password,12).then(hashedpassword=>{
+            user.password = hashedpassword
+            user.resetToken = undefined
+            user.expireToken = undefined
+            user.save().then(saved=>{
+                return res.status(201).json({message:"Password Updated Successfully"})
+            })
+            
+        })
+    })
+    .catch(err=>{
+        console.log(err)
+    })
+})
 module.exports = router

@@ -2,12 +2,9 @@ import React, {useState, useContext} from 'react'
 import { Link,useHistory } from 'react-router-dom'
 import axios from "axios"
 import M from "materialize-css"
-import { UserContext } from '../../App'
 
-const Signin = () => {
-    const {state, dispatch} = useContext(UserContext)
+const Reset = () => {
     const history = useHistory()
-    const [password, setPassword] = useState("")
     const [email, setEmail] = useState("")
 
     const postData = (e) =>{
@@ -18,8 +15,7 @@ const Signin = () => {
             return;
         }
 
-        axios.post("/signin",{
-            password,
+        axios.post("/resetpassword",{
             email
         },
         {
@@ -29,12 +25,8 @@ const Signin = () => {
 
         })
         .then(response=>{
-            console.log(response.data)
-            localStorage.setItem("jwt",response.data.token)
-            localStorage.setItem("user",JSON.stringify(response.data.user))
-            dispatch({type:"USER",payload:response.data.user})
-            M.toast({html: "SignedIn Successfully",classes:"#43a047 green darken-1"})
-            history.push('/')
+            M.toast({html:response.data.message,classes:"#43a047 green darken-1"})
+            history.push('/signin')
         })
         .catch(e=>{
             M.toast({html: e.response.data.error,classes:"#e53935 red darken-1"})
@@ -53,26 +45,14 @@ const Signin = () => {
                     value={email}
                     onChange={(e)=>{setEmail(e.target.value)}}
                 />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="password"
-                    value={password}
-                    onChange={(e)=>{setPassword(e.target.value)}}
-                />
+               
                 <button className="btn waves-effect waves-light #1e88e5 blue darken-1" onClick={(e)=>postData(e)}>
-                    Login
+                    Reset
                 </button>
 
-                <h6>
-                    <Link to={"/signup"}>Create an Account</Link>
-                </h6>
-                <h6>
-                    <Link to={"/reset"}>Forgot Password?</Link>
-                </h6>
             </div>
         </div>
     )
 }
 
-export default Signin
+export default Reset
